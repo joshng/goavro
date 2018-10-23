@@ -5,14 +5,20 @@ import (
 	"fmt"
 )
 
+// SymbolTable represents a group of compiled Codecs/schemas, with support for embedding other types by reference:
+// Schemas passed to NewCodec may contain fields whose types reference previously-registered schemas by name.
 type SymbolTable struct {
 	codecsByFullName map[string]*Codec
 }
 
+// NewSymbolTable constructs a new instance populated only with the builtin/native avro types. Add new schemas
+// to it with symbolTable.NewCodec.
 func NewSymbolTable() *SymbolTable {
 	return &SymbolTable{builtinSymbolTable()}
 }
 
+// NewCodec parses the provided schema and returns a Codec for operating on data serialized with the schema.
+// Schemas may refer to types whose schemas were previously registered with NewCodec.
 func (schemas *SymbolTable) NewCodec(schemaSpecification string) (*Codec, error) {
 	var schema interface{}
 
@@ -33,6 +39,11 @@ func (schemas *SymbolTable) NewCodec(schemaSpecification string) (*Codec, error)
 	}
 
 	return c, err
+}
+
+// GetCodec finds the existing Codec for the given fullName (or nil if the name is unrecognized)
+func (codecs *SymbolTable) GetCodec(fullName string) *Codec {
+	return codecs.codecsByFullName[fullName]
 }
 
 func builtinSymbolTable() map[string]*Codec {

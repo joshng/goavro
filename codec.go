@@ -267,6 +267,11 @@ func (c *Codec) CanonicalSchema() string {
 	return c.schemaCanonical
 }
 
+// FullName returns the full-name (namespace.name) of the schema
+func (c *Codec) FullName() string {
+	return c.typeName.fullName
+}
+
 const crc64Empty = uint64(0xc15d213aa4d7a795)
 
 func initCRC64AvroTable() [256]uint64 {
